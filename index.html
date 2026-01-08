@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search for the truth</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 { color: #333; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+        #result {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+        }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Search for the truth</h1>
+    <p>Uncover the facts instantly</p>
+    <input type="text" id="searchInput" placeholder="Enter your query here...">
+    <button onclick="handleSearch()">Search</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    async function handleSearch() {
+        const query = document.getElementById('searchInput').value;
+        const resultDiv = document.getElementById('result');
+        
+        if (!query) {
+            resultDiv.innerHTML = "<p class='error'>Please enter something!</p>";
+            return;
+        }
+
+        resultDiv.innerHTML = "Searching...";
+
+        try {
+            // NOTE: Live site par hum direct API key nahi daalte. 
+            // Vercel par ye backend function ke zariye call hona chahiye.
+            const response = await fetch('/api/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                resultDiv.innerHTML = "<strong>Result:</strong> " + JSON.stringify(data.message || data);
+            } else {
+                resultDiv.innerHTML = "<p class='error'>Error: " + (data.error || "Failed to fetch") + "</p>";
+            }
+        } catch (error) {
+            resultDiv.innerHTML = "<p class='error'>Connection Failed. Check if server is running.</p>";
+        }
+    }

@@ -13,15 +13,15 @@ async function handleSearch() {
     resultDiv.innerHTML = "<p style='color:#1a472a;'>Searching in Quran & Sahih Hadith...</p>";
 
     try {
-        // Humne yahan version 'v1beta' se badal kar 'v1' kar diya hai jo zyada stable hai
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+        // Version v1beta aur model gemini-1.5-flash ka sahi combination
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{ text: `You are an Islamic Scholar. Answer the question: "${query}" using only authentic Sahih al-Bukhari, Sahih Muslim, and Quranic references. Answer in Roman Urdu/Hindi but keep the Arabic/English references clear.` }]
+                    parts: [{ text: `Answer this Islamic question: "${query}" using authentic references from Quran, Sahih Bukhari and Sahih Muslim. Reply in Roman Urdu.` }]
                 }]
             })
         });
@@ -29,7 +29,6 @@ async function handleSearch() {
         const data = await response.json();
 
         if (data.error) {
-            // Agar abhi bhi error aaye toh humein wajh saaf dikhegi
             resultDiv.innerHTML = `<p style='color:red;'>API Error: ${data.error.message}</p>`;
             return;
         }
@@ -42,10 +41,10 @@ async function handleSearch() {
                     <div style="line-height:1.6; color:#333; white-space: pre-wrap;">${answer}</div>
                 </div>`;
         } else {
-            resultDiv.innerHTML = "<p style='color:red;'>No answer found. Try rephrasing your question.</p>";
+            resultDiv.innerHTML = "<p style='color:red;'>No answer found. Please try another question.</p>";
         }
             
     } catch (error) {
-        resultDiv.innerHTML = "<p style='color:red;'>Connection issue. Please check your internet or key.</p>";
+        resultDiv.innerHTML = "<p style='color:red;'>Connection issue. Please check your internet.</p>";
     }
 }

@@ -3,11 +3,11 @@ async function handleSearch() {
     const resultDiv = document.getElementById('result');
     
     if (!query) {
-        resultDiv.innerHTML = "<p style='color:red;'>Please enter a topic to search.</p>";
+        resultDiv.innerHTML = "<p class='error-msg'>Please enter a topic to search.</p>";
         return;
     }
 
-    resultDiv.innerHTML = "<p>Searching authentic sources...</p>";
+    resultDiv.innerHTML = "<p style='color: #1a472a;'>Searching in Sahih Collections...</p>";
 
     const options = {
         method: 'GET',
@@ -18,32 +18,31 @@ async function handleSearch() {
     };
 
     try {
-        // Aapki di hui collection URL
         const response = await fetch('https://hadiths-api.p.rapidapi.com/collections/639caf9a9ba6cf29e8b8c221', options);
         const data = await response.json();
 
         if (data && data.hadiths) {
-            // User ke topic ke hisaab se filter karna
             const filtered = data.hadiths.filter(h => 
                 h.english.toLowerCase().includes(query.toLowerCase())
             );
 
             if (filtered.length > 0) {
-                let html = "";
+                let html = "<h4>Results Found:</h4>";
                 filtered.slice(0, 5).forEach(h => {
                     html += `
                         <div class="hadith-card">
-                            <span class="ref">Source: Sahih Collection</span>
-                            <p>${h.english}</p>
+                            <span class="source-label">Sahih Bukhari/Muslim</span>
+                            <p style="font-size: 1.1rem; line-height: 1.6;">${h.english}</p>
+                            <p style="color: #888; font-size: 12px;">ID: ${h.id}</p>
                         </div>`;
                 });
                 resultDiv.innerHTML = html;
             } else {
-                resultDiv.innerHTML = "<p>No exact match found in this collection. Try keywords like 'Faith', 'Love', or 'Water'.</p>";
+                resultDiv.innerHTML = "<p>Maaf kijiye, koi reference nahi mila. Try keywords like 'Water', 'Hell', or 'Prayer'.</p>";
             }
         }
     } catch (error) {
-        resultDiv.innerHTML = "<p style='color:red;'>Error: Could not connect to API. Please check your key quota.</p>";
+        resultDiv.innerHTML = "<p class='error-msg'>Connection Error. Please check your API quota.</p>";
         console.error(error);
     }
 }
